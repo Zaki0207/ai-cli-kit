@@ -43,6 +43,17 @@ echo "Installed: $SCRIPT_DEST"
 STATUS_LINE_CONFIG='{"type":"command","command":"bash $HOME/.claude/statusline-command.sh"}'
 
 if [ -f "$SETTINGS" ]; then
+  if jq -e '.statusLine' "$SETTINGS" >/dev/null 2>&1; then
+    echo "Warning: statusLine already exists in $SETTINGS"
+    printf "Overwrite? [y/N] "
+    read -r answer
+    if [ "${answer:-N}" != "y" ] && [ "${answer:-N}" != "Y" ]; then
+      echo "Skipped settings update."
+      echo ""
+      echo "Done. Restart Claude Code to see the status bar."
+      exit 0
+    fi
+  fi
   # Merge into existing settings — preserve all other keys
   tmp=$(mktemp)
   jq --argjson sl "$STATUS_LINE_CONFIG" '. + {statusLine: $sl}' "$SETTINGS" > "$tmp"
