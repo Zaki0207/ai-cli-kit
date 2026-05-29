@@ -19,6 +19,12 @@ A collection of tools, configs, and tips for AI coding CLI assistants.
 |-----------|-------------|
 | [codex](codex/) | Tips and notes for OpenAI Codex CLI |
 
+### Tips
+
+| File | Description |
+|------|-------------|
+| [tips/remote-server-via-local-vpn.md](tips/remote-server-via-local-vpn.md) | SSH RemoteForward 让远程服务器借用本地 VPN 访问外网 |
+
 ## Contributing
 
 PRs welcome. Each tool/tip should live in its own subdirectory with a README.
