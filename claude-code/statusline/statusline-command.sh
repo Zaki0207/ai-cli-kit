@@ -178,15 +178,20 @@ five_resets_at=$(echo "$input" | jq -r '.rate_limits.five_hour.resets_at // empt
 week_resets_at=$(echo "$input" | jq -r '.rate_limits.seven_day.resets_at // empty')
 
 # ── 6. Reset times ────────────────────────────────────────────────────────
+# date -r <epoch> is macOS; Linux needs date -d @<epoch>
+fmt_epoch() {
+  _ts=$1; _fmt=$2
+  date -d "@$_ts" +"$_fmt" 2>/dev/null || date -r "$_ts" +"$_fmt" 2>/dev/null
+}
 # 5h: HH:MM only
 five_reset_time=""
 if [ -n "$five_resets_at" ]; then
-  five_reset_time=$(date -r "$five_resets_at" +%H:%M 2>/dev/null)
+  five_reset_time=$(fmt_epoch "$five_resets_at" "%H:%M")
 fi
 # 7d: MM-DD HH:MM (date + time, since it's days away)
 week_reset_time=""
 if [ -n "$week_resets_at" ]; then
-  week_reset_time=$(date -r "$week_resets_at" +"%m-%d %H:%M" 2>/dev/null)
+  week_reset_time=$(fmt_epoch "$week_resets_at" "%m-%d %H:%M")
 fi
 
 # ═══════════════════════════════════════════════════════════════════════════
