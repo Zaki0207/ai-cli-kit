@@ -1,0 +1,14 @@
+# Copy this file to:
+#   $HOME/.codex-zzy-api/config.toml
+#
+# Then replace the TODO values with your own third-party subscription settings.
+# Do not put this file under the shared default ~/.codex directory.
+
+model = "your-model"
+model_provider = "zzy-api"
+
+[model_providers.zzy-api]
+name = "zzy-api"
+base_url = "https://your-provider.example/v1"
+env_key = "OPENAI_API_KEY"
+wire_api = "responses"

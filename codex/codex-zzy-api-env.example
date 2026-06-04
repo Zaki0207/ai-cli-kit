@@ -1,0 +1,7 @@
+# Copy this file to:
+#   $HOME/.codex-zzy-api/env
+#
+# Then fill in your own third-party API key.
+# Keep this file private: chmod 600 "$HOME/.codex-zzy-api/env"
+
+OPENAI_API_KEY="TODO_your_private_third_party_api_key"

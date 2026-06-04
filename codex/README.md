@@ -6,7 +6,8 @@ Tips and notes for OpenAI Codex CLI.
 
 如果多人共用同一个 Linux 用户，但默认的 `~/.codex/config.toml` 已经配置给
 第三方 API 使用，可以保留默认 `codex` 不动，只在需要官方订阅时用
-[`codex-zzy`](codex-zzy)。
+[`codex-zzy`](codex-zzy)，需要自己的第三方 API 时用
+[`codex-zzy-api`](codex-zzy-api)。
 
 这个脚本会做两件事：
 
@@ -20,6 +21,7 @@ Tips and notes for OpenAI Codex CLI.
 ```bash
 codex              # 继续读取 ~/.codex/config.toml，走第三方 API
 codex-zzy          # 使用单独目录里的 ChatGPT 官方订阅登录态
+codex-zzy-api      # 使用单独目录里的个人第三方 API 配置
 ```
 
 ### 安装
@@ -30,9 +32,11 @@ codex-zzy          # 使用单独目录里的 ChatGPT 官方订阅登录态
 ./codex/install-codex-zzy.sh
 ```
 
-它会把 `codex-zzy` 和 `codex-official` 安装到 `$HOME/.local/bin`，创建
-`$HOME/.codex-zzy-official`，并自动给 `~/.zshrc` / `~/.bashrc` / `~/.profile`
-补上 `$HOME/.local/bin` 的 PATH 配置。
+它会把 `codex-zzy`、`codex-zzy-api` 和 `codex-official` 安装到
+`$HOME/.local/bin`，创建 `$HOME/.codex-zzy-official` 和
+`$HOME/.codex-zzy-api`，并自动给 `~/.zshrc` / `~/.bashrc` / `~/.profile`
+补上 `$HOME/.local/bin` 的 PATH 配置。安装脚本只会给
+`$HOME/.codex-zzy-api` 放 `config.toml.example` 和 `env.example`，不会写入你的 API key。
 
 如果只想看会改什么，不实际写文件：
 
@@ -41,6 +45,8 @@ codex-zzy          # 使用单独目录里的 ChatGPT 官方订阅登录态
 ```
 
 ### 首次登录
+
+官方订阅：
 
 远程服务器上通常用 device auth 更方便：
 
@@ -62,9 +68,24 @@ codex-zzy -C /path/to/project
 codex-zzy exec "summarize this repo"
 ```
 
+个人第三方 API：
+
+```bash
+cp "$HOME/.codex-zzy-api/config.toml.example" "$HOME/.codex-zzy-api/config.toml"
+cp "$HOME/.codex-zzy-api/env.example" "$HOME/.codex-zzy-api/env"
+vi "$HOME/.codex-zzy-api/config.toml"
+vi "$HOME/.codex-zzy-api/env"
+chmod 600 "$HOME/.codex-zzy-api/env"
+codex-zzy-api
+```
+
+`codex-zzy-api` 缺少 `$HOME/.codex-zzy-api/config.toml` 时会直接退出，不会回退读取
+`~/.codex/config.toml`。启动时它会先清掉共享 shell 里的 `OPENAI_*` / `AZURE_OPENAI_*`
+变量，再加载 `$HOME/.codex-zzy-api/env`，避免串到默认第三方 API。
+
 ### 注意
 
 - 不要把 `CODEX_HOME` 全局写进 `~/.zshrc` / `~/.bashrc`，否则默认 `codex` 也会被切走。
-- 不要覆盖 `codex` alias；官方订阅命令固定用 `codex-zzy`。
+- 不要覆盖 `codex` alias；官方订阅命令固定用 `codex-zzy`，个人第三方 API 固定用 `codex-zzy-api`。
 - 不要用 `codex-zzy login --with-api-key`。脚本会拒绝 `--with-api-key`
 和 `--with-access-token`，避免这个入口被误用成 API 模式。
