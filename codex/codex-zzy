@@ -1,0 +1,8 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+
+export CODEX_OFFICIAL_HOME="${CODEX_OFFICIAL_HOME:-$HOME/.codex-zzy-official}"
+
+exec "$script_dir/codex-official" "$@"

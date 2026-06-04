@@ -1,0 +1,44 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+# Run Codex with an isolated ChatGPT subscription login state.
+# This keeps shared-user third-party API settings out of this Codex process.
+
+codex_bin="${CODEX_BIN:-codex}"
+official_home="${CODEX_OFFICIAL_HOME:-$HOME/.codex-official}"
+
+for arg in "$@"; do
+  case "$arg" in
+    --with-api-key|--with-access-token)
+      printf 'codex-official: refusing %s; use "codex-official login --device-auth" for ChatGPT subscription login.\n' "$arg" >&2
+      exit 2
+      ;;
+  esac
+done
+
+if ! command -v "$codex_bin" >/dev/null 2>&1; then
+  printf 'codex-official: cannot find Codex CLI command: %s\n' "$codex_bin" >&2
+  printf 'Set CODEX_BIN to the Codex executable path if it is not on PATH.\n' >&2
+  exit 127
+fi
+
+mkdir -p "$official_home"
+chmod 700 "$official_home" 2>/dev/null || true
+
+export CODEX_HOME="$official_home"
+
+unset OPENAI_API_KEY
+unset OPENAI_BASE_URL
+unset OPENAI_API_BASE
+unset OPENAI_API_HOST
+unset OPENAI_API_TYPE
+unset OPENAI_ORG_ID
+unset OPENAI_ORGANIZATION
+unset OPENAI_PROJECT
+unset AZURE_OPENAI_API_KEY
+unset AZURE_OPENAI_ENDPOINT
+unset AZURE_OPENAI_AD_TOKEN
+unset AZURE_OPENAI_API_VERSION
+unset CODEX_ACCESS_TOKEN
+
+exec "$codex_bin" "$@"
