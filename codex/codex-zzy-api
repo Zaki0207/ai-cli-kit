@@ -7,7 +7,7 @@ set -euo pipefail
 codex_bin="${CODEX_BIN:-codex}"
 api_home="${CODEX_ZZY_API_HOME:-$HOME/.codex-zzy-api}"
 config_file="$api_home/config.toml"
-env_file="$api_home/env"
+auth_file="$api_home/auth.json"
 
 if ! command -v "$codex_bin" >/dev/null 2>&1; then
   printf 'codex-zzy-api: cannot find Codex CLI command: %s\n' "$codex_bin" >&2
@@ -32,21 +32,6 @@ if grep -Eq 'TODO_|your-provider|your-model' "$config_file"; then
   exit 1
 fi
 
-if [ ! -f "$env_file" ]; then
-  printf 'codex-zzy-api: missing private API environment file: %s\n' "$env_file" >&2
-  printf 'Create it from the example file first:\n' >&2
-  printf '  cp %s/env.example %s\n' "$api_home" "$env_file" >&2
-  printf '  vi %s\n' "$env_file" >&2
-  printf '  chmod 600 %s\n' "$env_file" >&2
-  exit 1
-fi
-
-if grep -Eq 'TODO_|your_private_third_party_api_key' "$env_file"; then
-  printf 'codex-zzy-api: %s still contains placeholder values.\n' "$env_file" >&2
-  printf 'Fill in your third-party API key before starting Codex.\n' >&2
-  exit 1
-fi
-
 export CODEX_HOME="$api_home"
 
 unset OPENAI_API_KEY
@@ -63,9 +48,19 @@ unset AZURE_OPENAI_AD_TOKEN
 unset AZURE_OPENAI_API_VERSION
 unset CODEX_ACCESS_TOKEN
 
-set -a
-# shellcheck disable=SC1090
-. "$env_file"
-set +a
+if [ "$#" -ge 2 ] && [ "$1" = "login" ]; then
+  case "$2" in
+    --with-api-key|--with-access-token)
+      exec "$codex_bin" "$@"
+      ;;
+  esac
+fi
+
+if [ ! -f "$auth_file" ]; then
+  printf 'codex-zzy-api: missing private API login: %s\n' "$auth_file" >&2
+  printf 'After editing %s, login once with:\n' "$config_file" >&2
+  printf '  printf '\''%%s\\n'\'' '\''YOUR_API_KEY'\'' | codex-zzy-api login --with-api-key\n' >&2
+  exit 1
+fi
 
 exec "$codex_bin" "$@"

@@ -47,9 +47,8 @@ src_official="$script_dir/codex-official"
 src_zzy="$script_dir/codex-zzy"
 src_zzy_api="$script_dir/codex-zzy-api"
 src_zzy_api_example="$script_dir/codex-zzy-api-config.example.toml"
-src_zzy_api_env_example="$script_dir/codex-zzy-api-env.example"
 
-if [ ! -f "$src_official" ] || [ ! -f "$src_zzy" ] || [ ! -f "$src_zzy_api" ] || [ ! -f "$src_zzy_api_example" ] || [ ! -f "$src_zzy_api_env_example" ]; then
+if [ ! -f "$src_official" ] || [ ! -f "$src_zzy" ] || [ ! -f "$src_zzy_api" ] || [ ! -f "$src_zzy_api_example" ]; then
   printf 'install-codex-zzy: run this script from the ai-cli-kit repository checkout.\n' >&2
   exit 1
 fi
@@ -123,7 +122,6 @@ run cp "$src_official" "$install_dir/codex-official"
 run cp "$src_zzy" "$install_dir/codex-zzy"
 run cp "$src_zzy_api" "$install_dir/codex-zzy-api"
 run cp "$src_zzy_api_example" "$api_home/config.toml.example"
-run cp "$src_zzy_api_env_example" "$api_home/env.example"
 run chmod 755 "$install_dir/codex-official" "$install_dir/codex-zzy" "$install_dir/codex-zzy-api"
 
 if [ "$update_rc" -eq 1 ]; then
@@ -161,10 +159,8 @@ Next for official subscription:
 
 Next for private third-party API:
   cp "$api_home/config.toml.example" "$api_home/config.toml"
-  cp "$api_home/env.example" "$api_home/env"
   vi "$api_home/config.toml"
-  vi "$api_home/env"
-  chmod 600 "$api_home/env"
+  printf '%s\n' 'YOUR_API_KEY' | codex-zzy-api login --with-api-key
   codex-zzy-api
 
 If the command is not found in the current terminal, open a new shell or run:

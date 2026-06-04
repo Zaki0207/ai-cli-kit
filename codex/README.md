@@ -36,7 +36,7 @@ codex-zzy-api      # 使用单独目录里的个人第三方 API 配置
 `$HOME/.local/bin`，创建 `$HOME/.codex-zzy-official` 和
 `$HOME/.codex-zzy-api`，并自动给 `~/.zshrc` / `~/.bashrc` / `~/.profile`
 补上 `$HOME/.local/bin` 的 PATH 配置。安装脚本只会给
-`$HOME/.codex-zzy-api` 放 `config.toml.example` 和 `env.example`，不会写入你的 API key。
+`$HOME/.codex-zzy-api` 放 `config.toml.example`，不会写入你的 API key。
 
 如果只想看会改什么，不实际写文件：
 
@@ -72,16 +72,15 @@ codex-zzy exec "summarize this repo"
 
 ```bash
 cp "$HOME/.codex-zzy-api/config.toml.example" "$HOME/.codex-zzy-api/config.toml"
-cp "$HOME/.codex-zzy-api/env.example" "$HOME/.codex-zzy-api/env"
 vi "$HOME/.codex-zzy-api/config.toml"
-vi "$HOME/.codex-zzy-api/env"
-chmod 600 "$HOME/.codex-zzy-api/env"
+printf '%s\n' 'YOUR_API_KEY' | codex-zzy-api login --with-api-key
 codex-zzy-api
 ```
 
 `codex-zzy-api` 缺少 `$HOME/.codex-zzy-api/config.toml` 时会直接退出，不会回退读取
 `~/.codex/config.toml`。启动时它会先清掉共享 shell 里的 `OPENAI_*` / `AZURE_OPENAI_*`
-变量，再加载 `$HOME/.codex-zzy-api/env`，避免串到默认第三方 API。
+变量，避免串到默认第三方 API。API key 通过 `codex-zzy-api login --with-api-key`
+保存到 `$HOME/.codex-zzy-api/auth.json`。
 
 ### 注意
 
