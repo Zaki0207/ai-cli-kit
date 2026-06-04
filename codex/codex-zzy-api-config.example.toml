@@ -1,7 +1,12 @@
 # Copy this file to:
 #   $HOME/.codex-zzy-api/config.toml
 #
-# Then replace the TODO values with your own third-party subscription settings.
+# You can also run:
+#   codex-zzy-api setup
+# after editing config.toml to save the API key interactively.
+#
+# If you copy this file manually, replace the TODO values with your own
+# third-party subscription settings.
 # Do not put this file under the shared default ~/.codex directory.
 
 model = "your-model"

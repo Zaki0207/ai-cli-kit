@@ -160,7 +160,7 @@ Next for official subscription:
 Next for private third-party API:
   cp "$api_home/config.toml.example" "$api_home/config.toml"
   vi "$api_home/config.toml"
-  printf '%s\n' 'YOUR_API_KEY' | codex-zzy-api login --with-api-key
+  codex-zzy-api setup
   codex-zzy-api
 
 If the command is not found in the current terminal, open a new shell or run:

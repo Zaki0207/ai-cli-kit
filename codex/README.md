@@ -73,14 +73,17 @@ codex-zzy exec "summarize this repo"
 ```bash
 cp "$HOME/.codex-zzy-api/config.toml.example" "$HOME/.codex-zzy-api/config.toml"
 vi "$HOME/.codex-zzy-api/config.toml"
-printf '%s\n' 'YOUR_API_KEY' | codex-zzy-api login --with-api-key
+codex-zzy-api setup
 codex-zzy-api
 ```
 
 `codex-zzy-api` 缺少 `$HOME/.codex-zzy-api/config.toml` 时会直接退出，不会回退读取
 `~/.codex/config.toml`。启动时它会先清掉共享 shell 里的 `OPENAI_*` / `AZURE_OPENAI_*`
-变量，避免串到默认第三方 API。API key 通过 `codex-zzy-api login --with-api-key`
-保存到 `$HOME/.codex-zzy-api/auth.json`。
+变量，避免串到默认第三方 API。
+
+`codex-zzy-api setup` 只负责交互式读取 API key，并通过 `codex login --with-api-key`
+保存到 `$HOME/.codex-zzy-api/auth.json`。`config.toml` 仍然由你从
+`config.toml.example` 复制后手动填写，方便直接复制和检查具体配置内容。
 
 ### 注意
 

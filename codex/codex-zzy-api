@@ -9,6 +9,54 @@ api_home="${CODEX_ZZY_API_HOME:-$HOME/.codex-zzy-api}"
 config_file="$api_home/config.toml"
 auth_file="$api_home/auth.json"
 
+clear_api_env() {
+  unset OPENAI_API_KEY
+  unset OPENAI_BASE_URL
+  unset OPENAI_API_BASE
+  unset OPENAI_API_HOST
+  unset OPENAI_API_TYPE
+  unset OPENAI_ORG_ID
+  unset OPENAI_ORGANIZATION
+  unset OPENAI_PROJECT
+  unset AZURE_OPENAI_API_KEY
+  unset AZURE_OPENAI_ENDPOINT
+  unset AZURE_OPENAI_AD_TOKEN
+  unset AZURE_OPENAI_API_VERSION
+  unset CODEX_ACCESS_TOKEN
+}
+
+run_api_key_setup() {
+  local api_key
+
+  if [ ! -f "$config_file" ]; then
+    printf 'codex-zzy-api: missing private API config: %s\n' "$config_file" >&2
+    printf 'Create it from the example file first:\n' >&2
+    printf '  cp %s/config.toml.example %s\n' "$api_home" "$config_file" >&2
+    printf '  vi %s\n' "$config_file" >&2
+    exit 1
+  fi
+
+  if grep -Eq 'TODO_|your-provider|your-model' "$config_file"; then
+    printf 'codex-zzy-api: %s still contains placeholder values.\n' "$config_file" >&2
+    printf 'Fill in your third-party provider base_url/model before saving the API key.\n' >&2
+    exit 1
+  fi
+
+  printf 'codex-zzy-api will save the API key under: %s\n' "$api_home" >&2
+  printf 'API key (input is hidden): ' >&2
+  IFS= read -rs api_key
+  printf '\n' >&2
+  if [ -z "$api_key" ]; then
+    printf 'codex-zzy-api: API key is required.\n' >&2
+    exit 1
+  fi
+
+  export CODEX_HOME="$api_home"
+  clear_api_env
+  printf '%s\n' "$api_key" | "$codex_bin" login --with-api-key
+  printf 'codex-zzy-api: API key saved. Start with: codex-zzy-api\n' >&2
+}
+
 if ! command -v "$codex_bin" >/dev/null 2>&1; then
   printf 'codex-zzy-api: cannot find Codex CLI command: %s\n' "$codex_bin" >&2
   printf 'Set CODEX_BIN to the Codex executable path if it is not on PATH.\n' >&2
@@ -17,6 +65,15 @@ fi
 
 mkdir -p "$api_home"
 chmod 700 "$api_home" 2>/dev/null || true
+
+if [ "$#" -ge 1 ]; then
+  case "$1" in
+    setup|login-api-key)
+      run_api_key_setup
+      exit 0
+      ;;
+  esac
+fi
 
 if [ ! -f "$config_file" ]; then
   printf 'codex-zzy-api: missing private API config: %s\n' "$config_file" >&2
@@ -33,20 +90,7 @@ if grep -Eq 'TODO_|your-provider|your-model' "$config_file"; then
 fi
 
 export CODEX_HOME="$api_home"
-
-unset OPENAI_API_KEY
-unset OPENAI_BASE_URL
-unset OPENAI_API_BASE
-unset OPENAI_API_HOST
-unset OPENAI_API_TYPE
-unset OPENAI_ORG_ID
-unset OPENAI_ORGANIZATION
-unset OPENAI_PROJECT
-unset AZURE_OPENAI_API_KEY
-unset AZURE_OPENAI_ENDPOINT
-unset AZURE_OPENAI_AD_TOKEN
-unset AZURE_OPENAI_API_VERSION
-unset CODEX_ACCESS_TOKEN
+clear_api_env
 
 if [ "$#" -ge 2 ] && [ "$1" = "login" ]; then
   case "$2" in
@@ -58,8 +102,8 @@ fi
 
 if [ ! -f "$auth_file" ]; then
   printf 'codex-zzy-api: missing private API login: %s\n' "$auth_file" >&2
-  printf 'After editing %s, login once with:\n' "$config_file" >&2
-  printf '  printf '\''%%s\\n'\'' '\''YOUR_API_KEY'\'' | codex-zzy-api login --with-api-key\n' >&2
+  printf 'After editing %s, save your API key with:\n' "$config_file" >&2
+  printf '  codex-zzy-api setup\n' >&2
   exit 1
 fi
 
